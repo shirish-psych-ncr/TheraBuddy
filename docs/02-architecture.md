@@ -1,6 +1,14 @@
 # Architecture and decision log
 
-Status: design baseline, not implemented. Date: 2026-10-15.
+Status: scaffold and membership-administration slice implemented locally; clinical architecture remains a design baseline. Date: 2026-10-15.
+
+## 2026-10-15 deployment decision update
+
+ADR-011: GitHub connects directly to Cloudflare Workers Builds, with Static Assets and D1 on one origin. GitHub Pages is unnecessary for the application; Sheets does not provide the required server authorization boundary. No storage-provider migration is required.
+
+ADR-012 (revised after account onboarding): Supabase Auth Free provides staff identities; the Worker verifies each bearer token using the maintained SDK getUser call and checks current D1 memberships. Cloudflare Access was rejected because onboarding required a card. Passwords go directly to Supabase, sessions remain in browser memory, and no service-role key is used. This replaces the password-hashing spike for the synthetic slice. D1 remains the application database, so no tenant data migration is needed. Supabase free-project pauses, email limits and live identity performance remain operational constraints.
+
+Migration 0003 adds organization-scoped memberships and membership audit records. No clinical privileges are implied by admin, supervisor or therapist labels. The old demo booking handler is not exposed by the router. Local device-only demo data remains separate from the authenticated staff portal. See [free deployment](13-free-deployment.md).
 
 ## Proposed deployment
 

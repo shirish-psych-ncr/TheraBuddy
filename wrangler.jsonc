@@ -3,6 +3,44 @@
   "name": "aasha-offline-demo",
   "main": "worker/index.ts",
   "compatibility_date": "2026-10-15",
-  "assets": { "directory": "./dist", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
-  "d1_databases": [{ "binding": "DB", "database_name": "aasha-local", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "database/migrations" }]
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "vars": {
+    "DEMO_MODE": "offline-synthetic"
+  },
+  "observability": {
+    "enabled": false
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "aasha-local",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "database/migrations"
+    }
+  ],
+  "env": {
+    "preview": {
+      "name": "aasha-offline-preview",
+      "preview_urls": false,
+      "vars": {
+        "DEMO_MODE": "offline-synthetic",
+        "SUPABASE_URL": "",
+        "SUPABASE_PUBLISHABLE_KEY": ""
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "aasha-preview",
+          "database_id": "e12915a9-419e-4a3c-baaf-4c7808d85680",
+          "migrations_dir": "database/migrations"
+        }
+      ]
+    }
+  }
 }

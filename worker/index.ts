@@ -1,14 +1,44 @@
-interface Env { DB: { prepare(sql: string): { first(): Promise<unknown> } } }
+import { apiError } from "./api";
+import type { Env } from "./types";
+import { authenticate, identityConfig } from "./auth";
+import { memberships } from "./memberships";
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const path = new URL(request.url).pathname;
-    const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
-    if (path === '/api/v1/health' && request.method === 'GET') {
+    if (path.startsWith("/api/")) {
+      if (path === "/api/v1/auth/config" && request.method === "GET") {
+        const config = identityConfig(env);
+        return config
+          ? Response.json(config, { headers: { "Cache-Control": "no-store" } })
+          : apiError(
+              503,
+              "SETUP_REQUIRED",
+              "Staff sign-in is awaiting account configuration.",
+            );
+      }
+      if (path === "/api/v1/health")
+        return Response.json(
+          { status: "ok", clinicalApi: false },
+          { headers: { "Cache-Control": "no-store" } },
+        );
+      const email = await authenticate(request, env);
+      if (!email)
+        return apiError(401, "AUTH_REQUIRED", "Sign in to your staff account.");
       try {
-        await env.DB.prepare('SELECT version FROM schema_info LIMIT 1').first();
-        return Response.json({ status: 'ok', mode: 'offline-synthetic-demo', clinicalApi: false }, { headers });
-      } catch { return Response.json({ status: 'unavailable', code: 'LOCAL_DATABASE_NOT_READY' }, { status: 503, headers }); }
+        return await memberships(request, env, path, email);
+      } catch {
+        return apiError(
+          503,
+          "UNAVAILABLE",
+          "The service is temporarily unavailable. Try again later.",
+        );
+      }
     }
-    return Response.json({ code: 'NOT_FOUND', message: 'No clinical API is enabled in this demo.' }, { status: 404, headers });
-  }
+    return apiError(
+      404,
+      "NOT_FOUND",
+      "No clinical API is enabled in this demo.",
+    );
+  },
 };

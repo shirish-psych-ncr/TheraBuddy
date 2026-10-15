@@ -1,6 +1,6 @@
 # Delivery plan
 
-All application work below is **not started**. Planning is complete only when the documentation checks pass. Work proceeds by dependency and evidence, not a promise of fixed dates.
+The scaffold, synthetic local demo and a bounded membership-administration slice exist. M1/M2 are incomplete: live identity/browser, recovery and clinical authorization evidence remain outstanding. Use the current handoff for exact checks. Work proceeds by dependency and evidence, not a promise of fixed dates.
 
 | Milestone | Deliverable | Dependencies | Exit evidence |
 |---|---|---|---|

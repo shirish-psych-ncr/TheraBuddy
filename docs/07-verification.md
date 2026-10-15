@@ -1,6 +1,6 @@
 # Verification and release gates
 
-No application tests have run because there is no app. This file defines future evidence requirements.
+Application tests exist for the synthetic demo and membership slice. This file defines the broader release evidence requirements; individual passing tests do not complete a milestone. See the current handoff for commands and limitations.
 
 ## Synthetic fixtures
 

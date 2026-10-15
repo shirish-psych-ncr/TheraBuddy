@@ -1,6 +1,6 @@
 # Aasha / Universal Therapy Centre Platform
 
-Planning baseline: 15 October 2026. This folder contains a product brief, supplied logo, and engineering guidance. **There is no application, database, deployment, or passing application test suite yet.** Aasha is the working project name and a possible centre brand; the product must support independently configured centres.
+Planning baseline: 15 October 2026. React/Vite provides a device-local synthetic demo; `/staff` provides a separate Supabase Auth + D1 membership administration slice. Centre admins can manage their own team; clinical APIs remain disabled. A remote preview D1 database has been provisioned. Hosting uses GitHub → Cloudflare Workers Builds on Free plans, subject to provider quotas. Follow [free deployment and staff setup](docs/13-free-deployment.md) and the current handoff for verified deployment status. Aasha is a working brand; the platform supports independently configured centres.
 
 ## Start here
 
@@ -18,7 +18,7 @@ Planning baseline: 15 October 2026. This folder contains a product brief, suppli
 12. [Complete source screen inventory](docs/11-screen-inventory.md)
 13. [Source evidence and external references](docs/12-evidence.md)
 
-The original [brief](Early%20Intervention%20Tracking%20App.txt) remains unchanged. The working logo has been prepared into web/PWA assets; its current provenance hash is recorded in docs/12-evidence.md and should be repaired or revalidated before public release. The brief is a conversation export containing repeated proposals, embedded sample prompts, UI text and earlier alternatives, not an executable specification. The numbered documents consolidate it; proposed engineering choices are labeled as such.
+The original [brief](Early%20Intervention%20Tracking%20App.txt) remains unchanged. It is a conversation export containing repeated proposals, embedded sample prompts, UI text and earlier alternatives, not an executable specification. The numbered documents consolidate it; proposed engineering choices are labeled as such.
 
 ## Documentation checks
 
@@ -29,4 +29,4 @@ node scripts/map-brief.mjs --check
 node scripts/check-docs.mjs
 ```
 
-These verify source-inventory coverage and local Markdown links. They do not test an application. No packages or external accounts are required. Future build commands are described as planned in the tooling guide and must not be reported as working until the app exists.
+These verify source-inventory coverage and local Markdown links. Local development requires Node 22.14+ (see `.nvmrc`): `npm ci`, then `npm run dev` (UI), `npm run worker:dev` (Worker + assets + local D1 on :8787), `npm run db:migrate:local`, `npm test`, `npm run build`, `npm run worker:check`. Remote hosting is selected as Cloudflare Workers Static Assets via Cloudflare Builds on the Free plan (docs/09-operations.md); deployment awaits account authorization.

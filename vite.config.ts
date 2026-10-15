@@ -19,7 +19,7 @@ export default defineConfig({
     },
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,woff2,woff}'],
-      navigateFallbackDenylist: [/^\/api\//],
+      navigateFallbackDenylist: [/^\/api(?:\/|$)/, /^\/staff(?:\/|$)/, /^\/cdn-cgi\//],
       cleanupOutdatedCaches: true,
       maximumFileSizeToCacheInBytes: 3 * 1024 * 1024
     }

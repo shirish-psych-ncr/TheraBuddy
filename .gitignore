@@ -13,3 +13,11 @@ test-results/
 *.db
 *.sqlite*
 exports/
+
+# Accidental duplicate exports and generated root icons are not source.
+**/* (1)
+**/* (1).*
+android-chrome-*.png
+favicon-*.png
+favicon.ico
+site.webmanifest
