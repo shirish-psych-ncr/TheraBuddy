@@ -18,7 +18,7 @@ Planning baseline: 15 October 2026. This folder contains a product brief, suppli
 12. [Complete source screen inventory](docs/11-screen-inventory.md)
 13. [Source evidence and external references](docs/12-evidence.md)
 
-The original [brief](Early%20Intervention%20Tracking%20App.txt) remains unchanged. It is a conversation export containing repeated proposals, embedded sample prompts, UI text and earlier alternatives, not an executable specification. The numbered documents consolidate it; proposed engineering choices are labeled as such.
+The original [brief](Early%20Intervention%20Tracking%20App.txt) remains unchanged. The working logo has been prepared into web/PWA assets; its current provenance hash is recorded in docs/12-evidence.md and should be repaired or revalidated before public release. The brief is a conversation export containing repeated proposals, embedded sample prompts, UI text and earlier alternatives, not an executable specification. The numbered documents consolidate it; proposed engineering choices are labeled as such.
 
 ## Documentation checks
 

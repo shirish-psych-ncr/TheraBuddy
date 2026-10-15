@@ -7,7 +7,7 @@ The original conversation export is 16,104 lines under PowerShell Get-Content on
 | File | SHA-256 at analysis |
 |---|---|
 | Early Intervention Tracking App.txt | FC69AC3B153FC51063E07FAC049C533603CFB8D13512B8C9FB591DDF728BCF65 |
-| logo.png | 62F6AF2C422FB788FCE8AE4B9511B8061932FF6FB1F5EADBE74FC59B6FC73A33 |
+| logo.png | Current workspace hash after local asset preparation: 63FEE6FB73CE942D18625C57345554334D97656BCD3445DB9D0F062FE43F4254 (provenance requires repair before public release) |
 
 ## Reading map
 
