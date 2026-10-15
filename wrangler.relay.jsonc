@@ -1,0 +1,19 @@
+# Optional demo sync relay — a SEPARATE, tiny Cloudflare Worker + KV namespace.
+# Deploy ONLY if you want cross-device mirroring of the synthetic demo while
+# hosting on GitHub Pages. This is not part of the staff/clinical system and
+# must never carry real patient data. See worker/demo-relay.ts for the trust
+# model. All steps below stay inside Cloudflare's Free tier limits.
+
+name = "aasha-demo-relay"
+main = "worker/demo-relay.ts"
+compatibility_date = "2026-10-01"
+
+[[kv_namespaces]]
+binding = "SLOTS"
+# Create with: npx wrangler kv namespace create AASHA_DEMO_SLOTS
+# then paste the returned id here. Never commit any secret values to Git.
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[vars]
+# The shared key lives ONLY as a secret, never in this file:
+#   npx wrangler secret put SYNC_KEY --config wrangler.relay.jsonc

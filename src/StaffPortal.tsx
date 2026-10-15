@@ -3,24 +3,52 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 
 type Organization = { id: string; name: string; role: string };
 type Member = { email: string; role: string; active: number; revision: number };
-async function api<T = unknown>(
+// On GitHub Pages there is no same-origin /api. The staff portal then targets
+// the separately deployed Worker origin (set via VITE_API_BASE at build time,
+// or entered once in the sign-in screen and kept in this browser only).
+const WORKER_KEY = "aasha-api-base-v1";
+function normalizeBase(value: string): string {
+  const trimmed = value.trim().replace(/\/+$/, "");
+  if (!trimmed) return "";
+  if (!/^https:\/\//i.test(trimmed))
+    throw new Error("The API origin must be an https:// URL.");
+  try {
+    const url = new URL(trimmed);
+    if (!/(^[a-z0-9-]+\.workers\.dev$|\.workers\.dev$)/i.test(url.hostname) && !url.hostname.endsWith(".com"))
+      throw new Error("");
+    return url.origin;
+  } catch {
+    throw new Error("That does not look like a valid https origin.");
+  }
+}
+function apiOrigin(): string {
+  const configured = normalizeBase(import.meta.env.VITE_API_BASE ?? "");
+  if (configured) return configured;
+  if (location.hostname.endsWith(".workers.dev")) return "";
+  const stored = localStorage.getItem(WORKER_KEY) ?? "";
+  return stored.replace(/\/+$/, "");
+}
+function api<T = unknown>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const token = await accessToken();
-  const headers = new Headers(options.headers);
-  if (token) headers.set("Authorization", "Bearer " + token);
-  const response = await fetch(path, {
-    ...options,
-    headers,
-    cache: "no-store",
-    redirect: "error",
-  });
-  if (response.status === 401)
-    throw new Error("Your session has ended. Sign in again to continue.");
-  const body = (await response.json()) as { message?: string };
-  if (!response.ok) throw new Error(body.message || "The request failed.");
-  return body as T;
+  return (async () => {
+    const token = await accessToken();
+    const headers = new Headers(options.headers);
+    if (token) headers.set("Authorization", "Bearer " + token);
+    const response = await fetch(apiOrigin() + path, {
+      ...options,
+      headers,
+      cache: "no-store",
+      redirect: "error",
+      mode: apiOrigin() ? "cors" : "same-origin",
+    });
+    if (response.status === 401)
+      throw new Error("Your session has ended. Sign in again to continue.");
+    const body = (await response.json()) as { message?: string };
+    if (!response.ok) throw new Error(body.message || "The request failed.");
+    return body as T;
+  })();
 }
 
 export default function StaffPortal() {
@@ -34,6 +62,8 @@ export default function StaffPortal() {
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const [ready, setReady] = useState(false);
+  const [apiBase, setApiBase] = useState(() => localStorage.getItem(WORKER_KEY) ?? "");
+  const staticHost = !location.hostname.endsWith(".workers.dev");
   const generation = useRef(0);
   const organization = identity?.organizations.find((o) => o.id === selected);
   useEffect(() => {
@@ -184,8 +214,8 @@ export default function StaffPortal() {
         enabled in this release.
       </p>
       <nav aria-label="Staff actions">
-        <a href="/">Open device-local demo</a> ·{" "}
-        <a href="/staff">Refresh sign-in</a> ·{" "}
+        <a href={`${import.meta.env.BASE_URL}index.html`}>Open device-local demo</a> ·{" "}
+        <a href={`${import.meta.env.BASE_URL}staff.html`}>Refresh sign-in</a> ·{" "}
         {identity && (
           <button className="text-button" onClick={() => void signOut()}>
             Sign out
@@ -207,6 +237,29 @@ export default function StaffPortal() {
             reloading signs you out.
           </p>
           <form onSubmit={(e) => void signIn(e)}>
+            {staticHost && (
+              <label>
+                Worker API origin (your deployed preview URL)
+                <input
+                  name="apibase"
+                  type="url"
+                  inputMode="url"
+                  placeholder="https://aasha-offline-preview.<account>.workers.dev"
+                  defaultValue={apiBase}
+                  onChange={(e) => {
+                    try {
+                      const value = normalizeBase(e.target.value);
+                      if (value) localStorage.setItem(WORKER_KEY, value);
+                      else localStorage.removeItem(WORKER_KEY);
+                      setApiBase(value);
+                      setError("");
+                    } catch (failure) {
+                      setError((failure as Error).message);
+                    }
+                  }}
+                />
+              </label>
+            )}
             <label>
               Email
               <input
