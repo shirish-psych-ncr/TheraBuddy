@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { cwd, exit } from 'node:process';
 
@@ -23,6 +23,15 @@ walk(root);
 const failures = [];
 if (duplicateFiles.length) failures.push(`duplicate source-like files remain: ${duplicateFiles.join(', ')}`);
 if (trackedRiskFiles.length) failures.push(`sensitive/local files are present: ${trackedRiskFiles.join(', ')}`);
+// Reject committed sync-relay secrets. The placeholder KV id is allowed to
+// remain — the relay is an optional component and CI must not depend on it.
+const relayPath = join(root, 'wrangler.relay.jsonc');
+if (existsSync(relayPath)) {
+  const relayConfig = readFileSync(relayPath, 'utf8');
+  if (/^\s*(SYNC_KEY|sync_key)\s*=\s*"[^"]+"/im.test(relayConfig)) {
+    failures.push('wrangler.relay.jsonc must never contain the sync secret inline; use `wrangler secret put SYNC_KEY`');
+  }
+}
 for (const required of ['README.md', 'AGENTS.md', 'docs/10-handoff.md', 'src/App.tsx', 'worker/index.ts']) {
   if (!existsSync(join(root, required))) failures.push(`required file is missing: ${required}`);
 }

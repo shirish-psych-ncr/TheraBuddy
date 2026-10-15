@@ -1,0 +1,56 @@
+# Static GitHub Pages delivery for the OFFLINE SYNTHETIC demo.
+# This publishes only the browser app (IndexedDB + service worker). It does NOT
+# run the staff/clinical API — that stays on the Cloudflare Worker preview per
+# docs/13-free-deployment.md. On Pages, /staff.html links to the separately
+# deployed Worker origin (VITE_API_BASE) and demo cross-device sync goes
+# through the optional KV-backed relay (worker/demo-relay.ts). Both are free.
+name: Deploy static demo to GitHub Pages
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Full verification first: audit, docs, unit tests, then a Pages-aware
+      # build (repo-relative base, index.html + staff.html entries, PWA assets).
+      - run: npm run audit && npm run check:docs && npm test
+      - name: Build for GitHub Pages
+        run: npm run build
+        env:
+          GITHUB_PAGES: "true"
+          AASHA_BASE: /${{ github.event.repository.name }}/
+          # Optional: point /staff.html at the deployed Worker so sign-in works
+          # from Pages too. Leave unset to keep the manual origin entry in the
+          # sign-in screen. Never put secrets in this value; it is public.
+          VITE_API_BASE: ""
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.output.outputs.page_url }}
+    steps:
+      - id: output
+        uses: actions/deploy-pages@v4

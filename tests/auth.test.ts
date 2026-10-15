@@ -68,7 +68,8 @@ describe("authoritative identity verification", () => {
       }),
     ).toBeNull();
     getUser.mockRejectedValue(new Error("offline"));
-    expect(await authenticate(request(), env)).toBeNull();
+    // authenticate() must swallow provider outages and deny, not throw.
+    await expect(authenticate(request(), env)).resolves.toBeNull();
   });
   it("closes the previous unauthenticated booking API", async () => {
     const r = await worker.fetch(
