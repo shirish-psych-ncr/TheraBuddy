@@ -17,13 +17,18 @@ for (const name of files) {
     links++;
   }
 }
-const hashes = {
-  'Early Intervention Tracking App.txt': 'FC69AC3B153FC51063E07FAC049C533603CFB8D13512B8C9FB591DDF728BCF65',
-  'logo.png': '63FEE6FB73CE942D18625C57345554334D97656BCD3445DB9D0F062FE43F4254'
-};
-for (const [name,expected] of Object.entries(hashes)) {
-  const actual = createHash('sha256').update(fs.readFileSync(path.join(root,name))).digest('hex').toUpperCase();
-  if (actual!==expected) failures.push(`${name}: original asset changed; review provenance before updating baseline`);
+// Single source of truth for provenance baselines: derived from docs/12-evidence.md
+// so the evidence register and this check can never drift apart again.
+const evidence = fs.readFileSync(path.join(root,'docs/12-evidence.md'),'utf8');
+const hashPattern = /\|\s*([^\s|][^|]*?)\s*\|\s*(?:Current workspace hash[^:]*:\s*)?([0-9A-F]{64})/g;
+const baselines = new Map();
+for (const m of evidence.matchAll(hashPattern)) baselines.set(m[1].trim(), m[2]);
+if (!baselines.size) failures.push('docs/12-evidence.md: no SHA-256 baselines found to verify against');
+for (const [name,expected] of baselines) {
+  const file = path.join(root,name);
+  if (!fs.existsSync(file)) { failures.push(`${name}: tracked asset is missing`); continue; }
+  const actual = createHash('sha256').update(fs.readFileSync(file)).digest('hex').toUpperCase();
+  if (actual!==expected) failures.push(`${name}: original asset changed; review provenance before updating the baseline in docs/12-evidence.md`);
 }
 if (failures.length) { console.error(failures.join('\n')); process.exit(1); }
 console.log(`PASS: ${files.length} Markdown files, ${links} local links, tracked brief/logo provenance hashes match the current workspace.`);

@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "aasha-offline-demo",
   "main": "worker/index.ts",
+  "patterns": ["worker/index.ts", "worker/api.ts", "worker/auth.ts", "worker/memberships.ts", "worker/types.ts"],
   "compatibility_date": "2026-10-15",
   "assets": {
     "directory": "./dist",

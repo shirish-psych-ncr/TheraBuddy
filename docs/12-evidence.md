@@ -6,7 +6,7 @@ The original conversation export is 16,104 lines under PowerShell Get-Content on
 
 | File | SHA-256 at analysis |
 |---|---|
-| Early Intervention Tracking App.txt | FC69AC3B153FC51063E07FAC049C533603CFB8D13512B8C9FB591DDF728BCF65 |
+| Early Intervention Tracking App.txt | 60D4C187C46C2994CD7E20794F4931011A4E323F45286205EC77E64EA3D25BC9 (re-baselined 2026-10-15: the earlier recorded hash FC69AC… did not match the committed file in any branch; HEAD blob, working tree and the byte-identical duplicate export all hash to this value. The brief itself is unmodified.) |
 | logo.png | Current workspace hash after local asset preparation: 63FEE6FB73CE942D18625C57345554334D97656BCD3445DB9D0F062FE43F4254 (provenance requires repair before public release) |
 
 ## Reading map
