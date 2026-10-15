@@ -61,6 +61,7 @@ describe("authoritative identity verification", () => {
         env,
       ),
     ).toBeNull();
+<<<<<<< HEAD
     // The misconfigured-provider and outage branches are asserted through the
     // worker entry point instead of calling authenticate() directly: vitest's
     // spy registry attributes mock rejections created inside a test body to
@@ -82,6 +83,17 @@ describe("authoritative identity verification", () => {
     // Provider outages must yield a denial (401), never a thrown error or 500.
     const outage = await worker.fetch(request(), env);
     expect(outage.status).toBe(401);
+=======
+    expect(
+      await authenticate(request(), {
+        ...env,
+        SUPABASE_URL: "https://evil.test",
+      }),
+    ).toBeNull();
+    getUser.mockRejectedValue(new Error("offline"));
+    // authenticate() must swallow provider outages and deny, not throw.
+    await expect(authenticate(request(), env)).resolves.toBeNull();
+>>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531
   });
   it("closes the previous unauthenticated booking API", async () => {
     const r = await worker.fetch(

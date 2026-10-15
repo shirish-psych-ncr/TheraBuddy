@@ -5,7 +5,10 @@ import { ArrowRight, ArrowUpRight, CalendarBlank, CaretDown, CaretLeft, CaretRig
 import { activities, appointmentSchema, childSchema, localDate, saveSession, seedWorkspace, uid, validateWorkspace, type Appointment, type Child, type Session, type Workspace } from './domain';
 import { createWorkspace, listWorkspaces, persistWorkspace, restoreWorkspace } from './storage';
 import { loadSettings, saveSettings, clearSettings, syncWorkspace, startAutoSync, type SyncSettings } from './sync';
+<<<<<<< HEAD
 import { ScreenRouter, ScreenIndexPage, FamilyPage, ScreenPage } from './screens';
+=======
+>>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531
 
 type Page='overview'|'children'|'schedule'|'sessions'|'library'|'settings';
 type Modal='child'|'appointment'|'centre'|'install'|null;
@@ -119,10 +122,13 @@ export default function App(){
       {error&&!modal&&!editing&&formError}
       {needRefresh&&<div className="update-banner">A new version is ready. Save open drafts before updating.<button className="button small" onClick={()=>void updateServiceWorker(true)}>Update app</button></div>}
       {pendingRemote&&<div className="update-banner"><CloudSlash size={18}/><span>A newer demo copy is waiting in your sync relay (revision {pendingRemote.revision} vs local {workspace.revision}).</span><button className="button small" disabled={busy} onClick={()=>void applyRemote(pendingRemote)}>Pull it</button><button className="button small secondary" onClick={()=>{setPendingRemote(null);setSyncStatus('idle');}}>Dismiss</button></div>}
+<<<<<<< HEAD
       {route.page==='screens'&&<ScreenIndexPage/>}
       {route.page==='family'&&route.family&&<FamilyPage code={route.family} navigate={navigate}/>}
       {route.page==='screen'&&route.screen&&<ScreenPage id={route.screen} navigate={navigate}/>}
       {(route.page==='unknown')&&<div className="empty panel padded"><h3>That page isn’t part of the demo workspace.</h3><p>Try the screen map for every brief screen, or return to your day.</p><button className="button" onClick={()=>navigate('screens')}>Open screen map <ArrowRight size={16}/></button> <button className="button secondary" onClick={()=>navigate('overview')}>Back to overview</button></div>}
+=======
+>>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531
       {page==='overview'&&<>
         <div className="page-heading"><div><div className="eyebrow">A LITTLE PROGRESS, EVERY DAY</div><h1>A thoughtful start to your day.</h1><p>Your team, your children, and the moments that matter.</p></div><button className="button" onClick={()=>openModal('appointment')}><Plus size={18}/> Schedule session</button></div>
         <section className="welcome-panel"><div><span className="welcome-label"><span className="status-dot"/> {date===localDate()?'TODAY AT YOUR CENTRE':'YOUR CENTRE DAY'}</span><h2>Small steps.<br/>Meaningful possibilities.</h2><p>{appointments.length?`You have ${appointments.filter(a=>a.status!=='cancelled').length} sessions planned. Make space for each child’s own pace.`:'An open day, ready for new possibilities.'}</p><button className="button welcome-button" onClick={()=>navigate('schedule')}>View your schedule <ArrowRight size={18}/></button></div><div className="welcome-art" aria-hidden="true"><div className="art-orbit orbit-one"/><div className="art-orbit orbit-two"/><div className="art-leaf leaf-one"/><div className="art-leaf leaf-two"/><div className="art-leaf leaf-three"/><div className="art-stem"/><div className="art-note"><CheckCircle size={24} weight="fill"/><span>Every little step counts.</span></div></div></section>

@@ -9,7 +9,10 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+<<<<<<< HEAD
   pull_request:
+=======
+>>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531
 
 permissions:
   contents: read
@@ -17,6 +20,7 @@ permissions:
   id-token: write
 
 concurrency:
+<<<<<<< HEAD
   group: pages-${{ github.ref }}
   cancel-in-progress: true
 
@@ -40,6 +44,13 @@ jobs:
           AASHA_BASE: /${{ github.event.repository.name }}/
   build:
     if: github.event_name != 'pull_request'
+=======
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+>>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531
     runs-on: ubuntu-latest
     environment: github-pages
     steps:
