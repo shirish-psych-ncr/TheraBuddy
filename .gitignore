@@ -1,14 +1,14 @@
 node_modules/
-<<<<<<< HEAD
-=======
 dist/
 build/
+.wrangler/
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 *.log
+*.db
+*.sqlite
 .vscode/
 .idea/
 *.swp
 *.swo
->>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531

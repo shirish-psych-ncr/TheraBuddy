@@ -3,24 +3,18 @@
 # run the staff/clinical API — that stays on the Cloudflare Worker preview per
 # docs/13-free-deployment.md. On Pages, /staff.html links to the separately
 # deployed Worker origin (VITE_API_BASE) and demo cross-device sync goes
-# through the optional KV-backed relay (worker/demo-relay.ts). Both are free.
+# through an optional relay. Provider free-tier quotas apply.
 name: Deploy static demo to GitHub Pages
 on:
   workflow_dispatch:
   push:
     branches: [main]
-<<<<<<< HEAD
   pull_request:
-=======
->>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-<<<<<<< HEAD
   group: pages-${{ github.ref }}
   cancel-in-progress: true
 
@@ -36,21 +30,14 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm run audit && npm run check:docs && npm test
+      - run: npm run audit && npm run check:docs && npm run check:screens && npm test
       - name: Build for GitHub Pages (dry run)
-        run: npm run build
+        run: npm run build:pages
         env:
           GITHUB_PAGES: "true"
           AASHA_BASE: /${{ github.event.repository.name }}/
   build:
     if: github.event_name != 'pull_request'
-=======
-  group: pages
-  cancel-in-progress: true
-
-jobs:
-  build:
->>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531
     runs-on: ubuntu-latest
     environment: github-pages
     steps:
@@ -62,20 +49,24 @@ jobs:
       - run: npm ci
       # Full verification first: audit, docs, unit tests, then a Pages-aware
       # build (repo-relative base, index.html + staff.html entries, PWA assets).
-      - run: npm run audit && npm run check:docs && npm test
+      - run: npm run audit && npm run check:docs && npm run check:screens && npm test
       - name: Build for GitHub Pages
-        run: npm run build
+        run: npm run build:pages
         env:
           GITHUB_PAGES: "true"
           AASHA_BASE: /${{ github.event.repository.name }}/
           # Optional: point /staff.html at the deployed Worker so sign-in works
-          # from Pages too. Leave unset to keep the manual origin entry in the
+          # on the Worker. Leave unset to show setup status on the
           # sign-in screen. Never put secrets in this value; it is public.
-          VITE_API_BASE: ""
-      - uses: actions/upload-pages-artifact@v3
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
   deploy:
+    permissions:
+      pages: write
+      id-token: write
     needs: build
     runs-on: ubuntu-latest
     environment:

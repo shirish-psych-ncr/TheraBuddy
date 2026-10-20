@@ -24,7 +24,10 @@
     "deploy:production": "node scripts/deploy-check.mjs production",
     "build:ci": "npm run audit && npm run check:docs && npm test && npm run build",
     "predeploy:preview": "npm run build:ci",
-    "deploy:check": "node scripts/deploy-check.mjs preview --check"
+    "deploy:check": "node scripts/deploy-check.mjs preview --check",
+    "build:pages": "node scripts/build-pages.mjs",
+    "check:screens": "node scripts/gen-screens.mjs --check",
+    "check:pages": "node scripts/check-pages.mjs"
   },
   "dependencies": {
     "@fontsource/manrope": "5.3.0",

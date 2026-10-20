@@ -2,7 +2,7 @@
 
 ## Selected topology
 
-GitHub source → Cloudflare Workers Builds → Workers Static Assets + D1. Supabase Auth Free handles staff identity. GitHub Pages cannot run the authorization/database API and is not required. Keeping UI and API on one origin avoids a second delivery pipeline. Google Sheets is not used as a patient database or permission boundary.
+GitHub source → GitHub Actions → GitHub Pages hosts the static synthetic PWA. A separate Cloudflare Worker hosts the secure staff portal and D1 API; Supabase Auth Free handles staff identity. The Pages `staff.html` entry links to that portal using the optional public repository variable `VITE_API_BASE`. Credentials and staff API traffic stay on the Worker origin. GitHub Pages cannot run the authorization/database API. Google Sheets is not used as a patient database or permission boundary.
 
 Cloudflare Access was rejected because this account's onboarding requires a card. No card, paid plan, R2, SMS, paid AI or purchased domain is required by the selected application design. Free provider quotas remain finite. Do not enable billing or upgrades to bypass a quota.
 
@@ -42,3 +42,7 @@ GitHub Actions runs verification only. Private repository Actions quotas and Clo
 ## Remaining release work
 
 Clinical workflows, assignment-based clinical permissions, platform provisioning UI, invitation/recovery automation, restore/retention evidence, live identity performance and full browser coverage remain incomplete. Membership management is bounded to 100 rows/centre. The offline demo does not sync to D1 and is not a security boundary. No real patient records are authorized.
+
+## Static-only deployment
+
+`npm run build:pages` emits deployable `dist/index.html`, `dist/staff.html`, bundled assets, manifest and service worker with `/TheraBuddy/` paths. Set `AASHA_BASE` for another repository or custom-domain root. Select GitHub Actions under repository Settings → Pages, then run the Pages workflow or push main. The demo needs no Supabase or Cloudflare account to load; staff setup remains separate. Hash navigation provides stable shareable links and refresh support. GitHub Pages ignores `_headers`; Worker security headers apply only to Worker responses. Verify the deployed URL and installation independently after publishing.

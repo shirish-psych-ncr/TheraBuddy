@@ -9,3 +9,8 @@
 
 .staff-portal{max-width:850px;margin:0 auto;padding:32px 20px}.staff-portal header{display:flex;gap:20px;align-items:center}.staff-portal nav{margin:24px 0}.staff-portal section{margin-top:24px}.staff-member{border-top:1px solid #dce5df;padding:18px 0}.staff-member fieldset{border:0;padding:0}.staff-active{display:flex;align-items:center;gap:10px;margin:16px 0}.staff-active input{width:auto}.staff-portal h4{overflow-wrap:anywhere}
 
+
+/* Standard anchors retain the workspace navigation layout. */
+.nav-item { text-decoration: none; }
+.breadcrumb nav { display: flex; align-items: center; gap: .5rem; }
+.breadcrumb a { color: inherit; }

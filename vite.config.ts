@@ -6,11 +6,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 // asset/start URLs must be relative to the repo base. Set AASHA_BASE (or the
 // repository name) when building for Pages; "/" keeps Cloudflare Workers hosting.
 const isPages = process.env.GITHUB_PAGES === 'true' || process.env.AASHA_BASE !== undefined;
-const base = process.env.AASHA_BASE ?? (process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : '/');
+const base = process.env.AASHA_BASE ?? (isPages && process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : '/');
 const icon = (name: string) => `${base}${name}`.replace(/\/{2,}/g, '/').replace(/^([^/])/, '/$1');
 
 export default defineConfig({
   base,
+  define: { "import.meta.env.VITE_STATIC_HOST": JSON.stringify(isPages ? "true" : "false") },
   plugins: [react(), VitePWA({
     registerType: 'prompt',
     includeAssets: ['logo.png', 'apple-touch-icon.png'],
@@ -27,9 +28,10 @@ export default defineConfig({
     },
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,woff2,woff}'],
+      globIgnores: ['**/staff.html'],
       // On Pages there is no same-origin API; denylist stays harmless and keeps
       // Worker-hosted /api and /staff responses out of the offline fallback.
-      navigateFallbackDenylist: [/^\/api(?:\/|$)/, /^\/staff(?:\/|$)/, /^\/cdn-cgi\//],
+      navigateFallbackDenylist: [/^\/api(?:\/|$)/, /\/staff(?:\.html|\/|$)/, /^\/cdn-cgi\//],
       cleanupOutdatedCaches: true,
       maximumFileSizeToCacheInBytes: 3 * 1024 * 1024
     }

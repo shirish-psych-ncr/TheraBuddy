@@ -2,7 +2,7 @@
 // Every screen ID gets a real, linked, breadcrumb-ed route (#/<FAMILY>/<NN>).
 // Implemented areas render live workspace data; the rest render an honest
 // specification card with cross-links and working breadcrumbs.
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, CaretRight, CheckCircle, ClipboardText, MagnifyingGlass } from '@phosphor-icons/react';
 import { SCREENS } from './screens.data';
 
@@ -35,38 +35,14 @@ export const FAMILIES: Family[] = [
 const familyOf = (id: string) => id.split('-')[0];
 
 // Which screens are backed by real interactive behaviour in this demo build.
-export const IMPLEMENTED: Record<string, string> = {
-  'PUB-01': '/', 'PUB-02': '/overview', 'PUB-09': '/staff.html', 'PUB-10': '/staff.html', 'PUB-11': '/staff.html',
-  'MST-01': '/overview', 'MST-02': '/schedule', 'MST-04': '/children', 'MST-05': '/schedule', 'MST-09': '/schedule',
-  'MST-15': '/children', 'MST-16': '/overview',
-  'CHD-01': '/children', 'CHD-02': '/children', 'CHD-18': '/children', 'CHD-19': '/sessions', 'CHD-23': '/schedule',
-  'CAL-01': '/schedule', 'CAL-03': '/schedule', 'CAL-04': '/schedule', 'CAL-06': '/schedule', 'CAL-08': '/schedule',
-  'CAL-10': '/schedule', 'CAL-13': '/schedule', 'CAL-14': '/schedule',
-  'ATT-01': '/schedule', 'ATT-02': '/schedule', 'ATT-03': '/schedule', 'ATT-05': '/schedule', 'ATT-06': '/schedule',
-  'ATT-08': '/sessions', 'ATT-10': '/sessions', 'ATT-12': '/sessions',
-  'THR-01': '/overview', 'THR-02': '/children', 'THR-03': '/schedule', 'THR-05': '/sessions', 'THR-06': '/children',
-  'THR-07': '/sessions', 'THR-08': '/sessions', 'THR-09': '/sessions', 'THR-15': '/sessions', 'THR-16': '/sessions',
-  'THR-19': '/sessions', 'THR-20': '/sessions', 'THR-24': '/sessions', 'THR-26': '/sessions', 'THR-27': '/settings',
-  'THR-31': '/sessions', 'THR-34': '/sessions', 'THR-35': '/sessions', 'THR-39': '/sessions', 'THR-40': '/sessions',
-  'THR-41': '/sessions', 'THR-42': '/sessions', 'THR-43': '/sessions', 'THR-44': '/sessions',
-  'ACT-01': '/library', 'ACT-02': '/library', 'ACT-03': '/library', 'ACT-06': '/library', 'ACT-14': '/sessions',
-  'ACT-15': '/sessions', 'ACT-16': '/sessions', 'ACT-17': '/sessions', 'ACT-24': '/library', 'ACT-25': '/library',
-  'EQP-01': '/settings', 'EQP-04': '/settings', 'EQP-08': '/settings', 'EQP-10': '/settings', 'EQP-17': '/library',
-  'GOA-01': '/children', 'GOA-04': '/sessions', 'GOA-10': '/children', 'GOA-11': '/sessions', 'GOA-12': '/sessions',
-  'GOA-23': '/children', 'GOA-24': '/sessions',
-  'INT-01': '/library', 'INT-05': '/sessions', 'INT-08': '/library', 'INT-09': '/library', 'INT-12': '/sessions',
-  'ASM-06': '/sessions', 'ASM-09': '/children', 'ASM-10': '/children', 'ASM-19': '/sessions', 'ASM-20': '/sessions', 'ASM-22': '/sessions',
-  'COL-02': '/sessions', 'COL-11': '/sessions', 'RPT-02': '/sessions', 'RPT-15': '/sessions', 'RPT-19': '/overview',
-  'CFG-01': '/settings', 'CFG-02': '/settings', 'CFG-04': '/settings', 'CFG-07': '/settings', 'CFG-08': '/settings',
-  'CFG-18': '/settings', 'CFG-21': '/settings', 'CFG-23': '/settings', 'CFG-24': '/settings',
-  'SYS-01': '/', 'SYS-02': '/', 'SYS-05': '/', 'SYS-06': '/', 'SYS-07': '/sessions', 'SYS-10': '/sessions',
-  'SYS-11': '/sessions', 'SYS-13': '/', 'SYS-16': '/settings', 'SYS-20': '/settings', 'SYS-21': '/settings',
-  'SYS-24': '/staff.html', 'SYS-27': '/settings', 'SYS-28': '/', 'SYS-29': '/overview', 'SYS-30': '/',
+export const DEMO_LINKS: Record<string, string> = {
+ 'CHD-01':'/children', 'CAL-01':'/schedule', 'THR-01':'/overview',
+ 'ACT-01':'/library', 'CFG-01':'/settings', 'PUB-10':'/staff.html',
 };
 
 export function parseRoute(hash: string): { page: string; family?: string; screen?: string } {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
-  if (parts.length >= 2 && /^[A-Z]{2,4}$/.test(parts[0]) && /^\d{2}$/.test(parts[1])) {
+  if (parts.length === 2 && /^[A-Z]{2,4}$/.test(parts[0]) && /^\d{2}$/.test(parts[1])) {
     return { page: 'screen', family: parts[0], screen: `${parts[0]}-${parts[1]}` };
   }
   if (parts[0] === 'families') return { page: parts[1] ? 'family' : 'index', family: parts[1] };
@@ -86,11 +62,11 @@ export function useHashRoute() {
   return { hash, route: parseRoute(hash) };
 }
 
-function Breadcrumbs({ trail }: { trail: { label: string; href?: string }[] }) {
-  return <nav className="screen-crumbs" aria-label="Breadcrumb">{trail.map((t, i) => <>
+export function Breadcrumbs({ trail }: { trail: { label: string; href?: string }[] }) {
+  return <nav className="screen-crumbs" aria-label="Breadcrumb">{trail.map((t, i) => <Fragment key={t.href ?? t.label}>
     {i > 0 && <CaretRight size={12} aria-hidden="true" />}
     {t.href ? <a href={t.href}>{t.label}</a> : <strong aria-current="page">{t.label}</strong>}
-  </>)}</nav>;
+  </Fragment>)}</nav>;
 }
 
 function RelatedLinks({ ids, note }: { ids: string[]; note?: string }) {
@@ -577,11 +553,7 @@ export function screensForFamily(code: string) {
 function relatedFor(id: string): string[] {
   const curated = (RELATED[id] ?? []).filter(r => SCREENS[r]);
   const siblings = screensForFamily(familyOf(id)).filter(s => s !== id && !curated.includes(s));
-  const others = Object.keys(SCREENS).filter(other => familyOf(other) !== familyOf(id) && !curated.includes(other));
-  const seed = parseInt(id.slice(-2), 10) || 1;
-  const extra: string[] = [];
-  for (let k = 0; k < 6 && k < others.length; k++) extra.push(others[(seed * 37 + k * 97) % others.length]);
-  return [...curated, ...siblings.slice(0, 4), ...extra];
+  return [...curated, ...siblings.slice(0, 4)];
 }
 
 export function searchScreens(query: string) {
@@ -601,7 +573,7 @@ export function searchScreens(query: string) {
 export function familyStats() {
   return FAMILIES.map(f => {
     const ids = screensForFamily(f.code);
-    const done = ids.filter(id => IMPLEMENTED[id]).length;
+    const done = ids.filter(id => DEMO_LINKS[id]).length;
     return { ...f, total: ids.length, done };
   });
 }
@@ -618,17 +590,17 @@ export function ScreenIndexPage() {
   const done = stats.reduce((n, f) => n + f.done, 0);
   const total = stats.reduce((n, f) => n + f.total, 0);
   return <div className="screen-index">
-    <Breadcrumbs trail={[{ label: 'Screens', href: '#/screens' }, { label: 'Index' }]} />
-    <div className="page-heading"><div><div className="eyebrow">COMPLETE BRIEF MAP · {total} SCREENS</div><h1>Every screen in the product brief.</h1><p>{done} areas wired to live demo data today; the rest are linked specification cards with their neighbours. This index is generated from <code>docs/11-screen-inventory.md</code>.</p></div></div>
+    <Breadcrumbs trail={[{ label: 'Workspace', href: '#/overview' }, { label: 'Screens', href: '#/screens' }, { label: 'Index' }]} />
+    <div className="page-heading"><div><div className="eyebrow">COMPLETE BRIEF MAP · {total} SCREENS</div><h1>Every screen in the product brief.</h1><p>All {total} brief entries are linked below. {done} have a related demo shortcut; a shortcut does not mean the full feature is implemented.</p></div></div>
     <label className="search screen-search"><MagnifyingGlass size={18} /><input aria-label="Search all screens" placeholder="Search 462 screens by ID, name or purpose…" value={query} onChange={e => setQuery(e.target.value)} /></label>
-    {query && <div className="panel padded screen-results">{matches.length ? matches.map(id => <a className="screen-result" key={id} href={screenHref(id)}><span className="screen-id">{id}</span><span><strong>{SCREENS[id].title}</strong><small>{SCREENS[id].purpose}</small></span>{IMPLEMENTED[id] ? <span className="badge green">Live</span> : <span className="badge">Spec</span>}<ArrowRight size={16} /></a>) : <p className="subtle">No screens match “{query}”.</p>}</div>}
+    {query && <div className="panel padded screen-results">{matches.length ? matches.map(id => <a className="screen-result" key={id} href={screenHref(id)}><span className="screen-id">{id}</span><span><strong>{SCREENS[id].title}</strong><small>{SCREENS[id].purpose}</small></span>{DEMO_LINKS[id] ? <span className="badge green">Demo link</span> : <span className="badge">Spec</span>}<ArrowRight size={16} /></a>) : <p className="subtle">No screens match “{query}”.</p>}</div>}
     {!query && <div className="family-grid">{stats.map(f => <a className="panel family-card" key={f.code} href={familyHref(f.code)}>
       <div className="card-top"><span className="family-code">{f.code}</span><span className="badge">{f.milestone}</span></div>
       <h2>{f.name}</h2><p>{f.blurb}</p>
-      <div className="progress-track" role="img" aria-label={`${f.done} of ${f.total} screens wired to live demo data`}><div className="progress-fill" style={{ width: `${Math.max(4, Math.round((f.done / f.total) * 100))}%` }} /></div>
-      <small>{f.done}/{f.total} live · {f.total} screens</small>
+      <div className="progress-track" role="img" aria-label={`${f.done} of ${f.total} entries with related demo shortcuts`}><div className="progress-fill" style={{ width: `${Math.max(4, Math.round((f.done / f.total) * 100))}%` }} /></div>
+      <small>{f.done}/{f.total} demo links · {f.total} screens</small>
     </a>)}</div>}
-    <footer className="screen-index-footer"><CheckCircle size={16} /><span>Inventory coverage is verified in CI (<code>npm run screens -- --check</code>).</span></footer>
+    <footer className="screen-index-footer"><CheckCircle size={16} /><span>Browse all 462 brief entries across 19 areas.</span></footer>
   </div>;
 }
 
@@ -639,17 +611,17 @@ export function FamilyPage({ code, navigate }: { code: string; navigate: (page: 
   const idx = FAMILIES.findIndex(f => f.code === code);
   const prev = FAMILIES[idx - 1], next = FAMILIES[idx + 1];
   return <div className="family-page">
-    <Breadcrumbs trail={[{ label: 'Screens', href: '#/screens' }, { label: family.name }]} />
-    <div className="page-heading"><div><div className="eyebrow">{family.area.toUpperCase()} · {family.milestone}</div><h1>{family.name}</h1><p>{family.blurb}</p></div>{family.entry && !family.entry.includes('staff') && <button className="button" onClick={() => navigate(family.entry.replace('/', '') || 'overview')}><ArrowRight size={18}/> Enter demo</button>}{family.entry?.includes('staff') && <a className="button" href={import.meta.env.BASE_URL + 'staff.html'}>Open staff portal <ArrowRight size={18} /></a>}</div>
+    <Breadcrumbs trail={[{ label: 'Workspace', href: '#/overview' }, { label: 'Screens', href: '#/screens' }, { label: family.name }]} />
+    <div className="page-heading"><div><div className="eyebrow">{family.area.toUpperCase()} · {family.milestone}</div><h1>{family.name}</h1><p>{family.blurb}</p></div>{family.entry && !family.entry.includes('staff') && <button className="button" onClick={() => navigate(family.entry!.replace('/', '') || 'overview')}><ArrowRight size={18}/> Enter demo</button>}{family.entry?.includes('staff') && <a className="button" href={import.meta.env.BASE_URL + 'staff.html'}>Open staff portal <ArrowRight size={18} /></a>}</div>
     <div className="family-nav">{prev && <a className="text-button" href={familyHref(prev.code)}>← {prev.name}</a>}<span className="subtle">{ids.length} screens</span>{next && <a className="text-button" href={familyHref(next.code)}>{next.name} →</a>}</div>
     <div className="screen-list panel">{ids.map(id => {
-      const meta = SCREENS[id]; const live = IMPLEMENTED[id];
+      const meta = SCREENS[id]; const live = DEMO_LINKS[id];
       return <div className="screen-row" key={id}>
         <a className="screen-row-main" href={screenHref(id)}>
           <span className="screen-id">{id}</span>
           <span className="screen-row-text"><strong>{meta.title}</strong><small>{meta.purpose}</small></span>
         </a>
-        {live ? <button className="button small soft" onClick={() => navigate(live.replace(/^\/|\/staff\.html$/g, '') || 'overview')}>Open live view <ArrowRight size={14} /></button> : <a className="badge" href={screenHref(id)}>Specification</a>}
+        {live ? <a className="button small soft" href={live.includes('staff') ? import.meta.env.BASE_URL + 'staff.html' : '#/' + (live.slice(1) || 'overview')}>Open related demo <ArrowRight size={14} /></a> : <a className="badge" href={screenHref(id)}>Specification</a>}
         <a className="text-button subtle-link" href={screenHref(id)}>Details <ArrowRight size={14} /></a>
       </div>;
     })}</div>
@@ -664,15 +636,15 @@ export function ScreenPage({ id, navigate }: { id: string; navigate: (page: stri
   const pos = ids.indexOf(id);
   const prev = ids[pos - 1], next = ids[pos + 1];
   const related = [...new Set(relatedFor(id))];
-  const live = IMPLEMENTED[id];
+  const live = DEMO_LINKS[id];
   const liveTarget = live ? (live.replace(/^\/|\/staff\.html$/g, '') || 'overview') : '';
   return <article className="screen-page">
-    <Breadcrumbs trail={[{ label: 'Screens', href: '#/screens' }, { label: family.name, href: familyHref(family.code) }, { label: id }]} />
-    <header className="screen-header"><div><div className="eyebrow">{family.name.toUpperCase()} · {family.area.toUpperCase()} · MILESTONE {family.milestone}</div><h1>{meta.title}</h1><p>{meta.purpose}</p></div><div className="screen-badges">{live ? <span className="badge green"><CheckCircle size={13} /> Live in demo</span> : <span className="badge amber">Backlog · specification</span>}<span className="screen-id">{id}</span></div></header>
-    {live && <div className="update-banner"><ClipboardText size={18} /><span>This screen’s behaviour is demonstrated inside the live workspace.</span>{live.startsWith('/') && !live.includes('staff') && <button className="button small" onClick={() => navigate(liveTarget)}>Open live view <ArrowRight size={16} /></button>}{live.includes('staff') && <a className="button small" href={import.meta.env.BASE_URL + 'staff.html'}>Open staff portal <ArrowRight size={16} /></a>}</div>}
-    {!live && <div className="field-note">This is a backlog screen from the product brief. It is fully specified here and reachable from every related screen, but its interactive behaviour ships with milestone {family.milestone}. Nothing on this page stores or transmits data.</div>}
+    <Breadcrumbs trail={[{ label: 'Workspace', href: '#/overview' }, { label: 'Screens', href: '#/screens' }, { label: family.name, href: familyHref(family.code) }, { label: id }]} />
+    <header className="screen-header"><div><div className="eyebrow">{family.name.toUpperCase()} · {family.area.toUpperCase()} · MILESTONE {family.milestone}</div><h1>{meta.title}</h1><p>{meta.purpose}</p></div><div className="screen-badges">{live ? <span className="badge green"><CheckCircle size={13} /> Related demo available</span> : <span className="badge amber">Backlog · specification</span>}<span className="screen-id">{id}</span></div></header>
+    {live && <div className="update-banner"><ClipboardText size={18} /><span>A related demonstration is available. The complete brief feature is still backlog.</span>{live.startsWith('/') && !live.includes('staff') && <button className="button small" onClick={() => navigate(liveTarget)}>Open related demo <ArrowRight size={16} /></button>}{live.includes('staff') && <a className="button small" href={import.meta.env.BASE_URL + 'staff.html'}>Open staff portal <ArrowRight size={16} /></a>}</div>}
+    {!live && <div className="field-note">This is a backlog screen from the product brief. This page summarizes its purpose and links to related entries; implementation is planned in milestone {family.milestone}. Nothing on this page stores or transmits data.</div>}
     <section className="panel padded"><h2>What this screen does</h2><p className="section-description">{meta.purpose}</p>
-      <dl className="screen-spec"><dt>Screen ID</dt><dd>{id}</dd><dt>Area</dt><dd>{family.name} ({family.code}) — {family.area}</dd><dt>Milestone band</dt><dd>{family.milestone}</dd><dt>Status</dt><dd>{live ? 'Wired into the offline demo workspace' : 'Backlog / not implemented'}</dd>{live && <><dt>Live location</dt><dd>{liveTarget === 'overview' ? 'Workspace overview' : live}</dd></>}{family.entry && <><dt>Demo entry point</dt><dd>{family.entry}</dd></>}</dl>
+      <dl className="screen-spec"><dt>Screen ID</dt><dd>{id}</dd><dt>Area</dt><dd>{family.name} ({family.code}) — {family.area}</dd><dt>Milestone band</dt><dd>{family.milestone}</dd><dt>Status</dt><dd>{'Backlog / full feature not implemented'}</dd>{live && <><dt>Related demo</dt><dd>{liveTarget === 'overview' ? 'Workspace overview' : live}</dd></>}{family.entry && <><dt>Demo entry point</dt><dd>{family.entry}</dd></>}</dl>
     </section>
     <RelatedLinks ids={related} note="Linked screens in the brief:" />
     <nav className="screen-pager" aria-label="Sibling screens">
@@ -683,6 +655,6 @@ export function ScreenPage({ id, navigate }: { id: string; navigate: (page: stri
 }
 
 export function NotFound({ what }: { what: string }) {
-  return <div className="screen-page"><Breadcrumbs trail={[{ label: 'Screens', href: '#/screens' }, { label: 'Not found' }]} />
+  return <div className="screen-page"><Breadcrumbs trail={[{ label: 'Workspace', href: '#/overview' }, { label: 'Screens', href: '#/screens' }, { label: 'Not found' }]} />
     <div className="empty"><h3>Screen not found</h3><p>{what} isn’t in the brief inventory. Browse the full map instead.</p><a className="button secondary" href="#/screens">Open screen index <ArrowRight size={16} /></a></div></div>;
 }

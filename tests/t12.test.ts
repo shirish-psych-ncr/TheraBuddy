@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 const { getUser } = vi.hoisted(() => ({ getUser: vi.fn() }));
 vi.mock("@supabase/supabase-js", () => ({ createClient: () => ({ auth: { getUser } }) }));
-import worker from "/workspace/worker/index";
+import worker from "../worker/index";
 const env = { DB: {} as any, SUPABASE_URL: "https://example.supabase.co", SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test" };
 const request = (token = "token") => new Request("https://app.test/api/v1/me", { headers: { Authorization: `Bearer ${token}` } });
 describe("t12", () => {

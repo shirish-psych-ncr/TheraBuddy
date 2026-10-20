@@ -14,7 +14,7 @@ const request = (token = "token") =>
   new Request("https://app.test/api/v1/me", {
     headers: { Authorization: `Bearer ${token}` },
   });
-beforeEach(() => getUser.mockReset());
+beforeEach(() => { getUser.mockReset(); });
 describe("authoritative identity verification", () => {
   it("accepts only a confirmed current user and ignores user metadata roles", async () => {
     getUser.mockResolvedValue({
@@ -61,39 +61,12 @@ describe("authoritative identity verification", () => {
         env,
       ),
     ).toBeNull();
-<<<<<<< HEAD
-    // The misconfigured-provider and outage branches are asserted through the
-    // worker entry point instead of calling authenticate() directly: vitest's
-    // spy registry attributes mock rejections created inside a test body to
-    // that test when a lazily-initialised auth client (created per call by
-    // authenticate()) never attaches a handler synchronously. Routing through
-    // worker.fetch keeps the assertions honest while avoiding the misattribution.
-    const evil = await worker.fetch(request(), {
-      ...env,
-      SUPABASE_URL: "https://evil.test",
-    });
+    const evil = await worker.fetch(request(), { ...env, SUPABASE_URL: "https://evil.test" });
     expect(evil.status).toBe(401);
-    // Pre-construct the rejection outside vitest's spy bookkeeping: when the
-    // mock creates the rejection itself (mockRejectedValue) and the consumer
-    // (authenticate's lazily-initialised auth client) attaches its handler a
-    // microtask late, the runner flags it as unhandled and fails this test.
-    const offline = Promise.reject(new Error("offline"));
-    offline.catch(() => {}); // keep Node quiet until the awaited path consumes it
-    getUser.mockReturnValue(offline);
+    getUser.mockRejectedValue(new Error("offline"));
     // Provider outages must yield a denial (401), never a thrown error or 500.
     const outage = await worker.fetch(request(), env);
     expect(outage.status).toBe(401);
-=======
-    expect(
-      await authenticate(request(), {
-        ...env,
-        SUPABASE_URL: "https://evil.test",
-      }),
-    ).toBeNull();
-    getUser.mockRejectedValue(new Error("offline"));
-    // authenticate() must swallow provider outages and deny, not throw.
-    await expect(authenticate(request(), env)).resolves.toBeNull();
->>>>>>> 1c17f7c8fb89500b5b559baa37bbbf9cc54a5531
   });
   it("closes the previous unauthenticated booking API", async () => {
     const r = await worker.fetch(

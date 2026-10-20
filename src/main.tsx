@@ -7,6 +7,7 @@ import '@fontsource/manrope/latin-700.css';
 import '@fontsource/manrope/latin-800.css';
 import App from './App';
 import StaffPortal from './StaffPortal';
+import StaticStaffEntry from './StaticStaffEntry';
 import './styles.css';
 
 class ErrorBoundary extends React.Component<{children:React.ReactNode},{error:boolean}> {
@@ -19,4 +20,4 @@ class ErrorBoundary extends React.Component<{children:React.ReactNode},{error:bo
 // using the /staff pathname. Check both so either entry renders the portal.
 const path = location.pathname.toLowerCase();
 const isStaff = path.startsWith('/staff') || /\/staff(\.html)?$/.test(path);
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><ErrorBoundary>{isStaff ? <StaffPortal/> : <App/>}</ErrorBoundary></React.StrictMode>);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><ErrorBoundary>{isStaff ? (import.meta.env.VITE_STATIC_HOST === "true" ? <StaticStaffEntry/> : <StaffPortal/>) : <App/>}</ErrorBoundary></React.StrictMode>);

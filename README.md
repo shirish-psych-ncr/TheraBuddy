@@ -1,6 +1,6 @@
 # Aasha / Universal Therapy Centre Platform
 
-Planning baseline: 15 October 2026. React/Vite provides a device-local synthetic demo; `/staff` provides a separate Supabase Auth + D1 membership administration slice. Centre admins can manage their own team; clinical APIs remain disabled. A remote preview D1 database has been provisioned. Hosting uses GitHub → Cloudflare Workers Builds on Free plans, subject to provider quotas. Follow [free deployment and staff setup](docs/13-free-deployment.md) and the current handoff for verified deployment status. Aasha is a working brand; the platform supports independently configured centres.
+Planning baseline: 15 October 2026. React/Vite provides a device-local synthetic demo; `/staff` provides a separate Supabase Auth + D1 membership administration slice. Centre admins can manage their own team; clinical APIs remain disabled. A remote preview D1 database has been provisioned. The synthetic PWA can be hosted directly on GitHub Pages as standard HTML, CSS and JavaScript. The separate secure staff portal uses Cloudflare Workers + D1 and Supabase Auth, subject to provider free-tier quotas. Follow [free deployment and staff setup](docs/13-free-deployment.md) and the current handoff for verified deployment status. Aasha is a working brand; the platform supports independently configured centres.
 
 ## Start here
 
@@ -30,3 +30,11 @@ node scripts/check-docs.mjs
 ```
 
 These verify source-inventory coverage and local Markdown links. Local development requires Node 22.14+ (see `.nvmrc`): `npm ci`, then `npm run dev` (UI), `npm run worker:dev` (Worker + assets + local D1 on :8787), `npm run db:migrate:local`, `npm test`, `npm run build`, `npm run worker:check`. Remote hosting is selected as Cloudflare Workers Static Assets via Cloudflare Builds on the Free plan (docs/09-operations.md); deployment awaits account authorization.
+
+## Static GitHub Pages build
+
+Run `npm ci` then `npm run build:pages`. Publish the contents of `dist` (not the source files). The default base is `/TheraBuddy/`; set `AASHA_BASE=/` for a root-domain deployment. Serve over HTTPS or localhost; opening HTML with `file://` does not provide PWA support.
+
+In GitHub Settings → Pages, select GitHub Actions. `.github/workflows/pages.yml` verifies and publishes pushes to main. Hash routes such as `#/screens` and `#/CHD/01` work on refresh without server rewrites. All 462 brief entries have linked specification pages across 19 families; these are not 462 implemented clinical workflows.
+
+Optional repository variable `VITE_API_BASE` is the public HTTPS origin of the separately deployed staff Worker. `staff.html` links there; credentials and API requests stay on that server’s origin. Leave it unset until the backend is ready. No API secret belongs in a Vite variable.

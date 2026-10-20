@@ -70,3 +70,7 @@ Version centre identity, timezone, enabled disciplines, hours, scheduling defaul
 ## Client state
 
 Query keys include organization and resource scope. Clear sensitive query caches on logout, revocation and organization switch; never persist them automatically. Form state remains distinct from server-confirmed data. Show saving/saved/failed/conflicted states. Use version checks; invalidate related queries after confirmed writes. Abort or ignore responses arriving from a previous organization context.
+
+## ADR-013 — Static Pages frontend (2026-10-15)
+
+Selected at user request: publish the synthetic React/Vite PWA as built HTML/CSS/JS on GitHub Pages. Use repository-relative asset and manifest URLs plus hash routing, so every directory and workspace link survives reload without server rewrites. Workers Static Assets remains the secure staff portal host with same-origin Supabase-verified API and tenant-authorized D1 access. The Pages staff entry is a public outbound link, not a cross-origin credential client. Staff HTML and API navigation are excluded from the service worker. No database migration or clinical authorization change. GitHub Pages does not enforce the Worker `_headers` file. All inventory detail pages remain backlog specifications; demo shortcuts do not change their implementation status.

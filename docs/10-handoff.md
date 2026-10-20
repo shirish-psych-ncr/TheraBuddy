@@ -1,5 +1,20 @@
 # Current handoff
 
+## Latest session: static GitHub Pages PWA (2026-10-15)
+
+This section supersedes earlier hosting and verification status. User requested standard static HTML delivery with connected screens and breadcrumbs.
+
+- Added portable build:pages and generated-output verification. Output includes index.html, staff.html, CSS/JS, icons, manifest, service worker and .nojekyll. Default repository base /TheraBuddy/; root-domain override AASHA_BASE=/.
+- Repaired committed merge-conflict markers in App, auth tests, Pages workflow and .gitignore. Corrected platform-specific test imports and a beforeEach callback accidentally returning a mock as a failing cleanup function.
+- Workspace navigation uses standard hash anchors; direct links, browser history, family trails, related links and previous/next screens connect the inventory. All 462 entries across 19 families remain specification/backlog pages; six related demo shortcuts are not full-feature completion. Inventory status has not been upgraded.
+- Static staff entry links only to a build-configured HTTPS Worker origin. Removed arbitrary browser-stored API-origin input; staff credentials and API remain same-origin on the Worker. Staff HTML is not precached and staff/API navigation is excluded from fallback. No database migration.
+- Pages workflow verifies source, docs, inventory and tests, builds repo-relative output, uploads artifact and deploys with job-scoped Pages permissions. Repository Settings → Pages must use GitHub Actions. No new cloud resources, paid services, billing activation or secrets.
+
+Verification: npm test passed 43 tests in 8 files, including rendering and checking all 462 directory pages and family links. npm run check:docs, check:screens and audit passed. TypeScript and Pages build passed; generated manifest/assets and service-worker exclusions passed check:pages. The bundle emits a size warning (~553 kB main JS before gzip); further lazy loading is optional future optimization. Browser automation timed out: no visual, offline-installation or deployed-site success is claimed. Final rebuild after navigation scroll/menu polish passed, including generated-output checks.
+
+Deployment: this session prepares local source and dist; it has not pushed or published these changes. Existing tracked dist files are generated output; the Actions workflow rebuilds from source. Secure staff backend is still awaiting the separate free Supabase organization/project and initial administrator setup described below. Synthetic demo only. Next step: publish the verified Pages workflow, verify the live repository path/PWA installation, then finish staff identity provisioning separately.
+
+
 ## Latest decision: no payment card (2026-10-15)
 
 User reported Cloudflare Access onboarding requires a card. Access was abandoned before subscribing or publishing. Replaced the adapter with Supabase Auth Free using pinned supabase-js 2.117.3: passwords go directly to Supabase; Worker getUser verifies current confirmed identity; D1 remains the role authority. Browser sessions stay in memory. User explicitly chose to create a separate free Supabase organization and will provide its name. Do not create the Aasha project in the existing Mind Grace organization or reuse its inactive clinic project. The previous Access test results below are historical; rerun the revised suite before publishing. No paid services were activated. See docs/13-free-deployment.md for the revised current runbook.
